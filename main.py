@@ -86,7 +86,7 @@ def delete_override(list):
     return False
 
 # Set up beautifulsoup4
-page = requests.get("https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p6/javadocs/Intersection.html")
+page = requests.get("https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html")
 # soup = BeautifulSoup(open("./Intersection.html"), "html.parser")
 soup = BeautifulSoup(page.text, "html.parser")
 className = soup.title.string.lower()
