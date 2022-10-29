@@ -1,8 +1,18 @@
 #!/usr/bin/env python3
 
 # import beautifulsoup4
+from email.policy import default
+from importlib.resources import path
 from bs4 import BeautifulSoup
 import requests
+import argparse
+parser=argparse.ArgumentParser()
+parser.add_argument('--output', type=bool,default=True, help="Redirect stdout to java file with class name.")
+parser.add_argument('--link', type=str, required=False,
+                    default='https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p6/javadocs/Intersection.html',
+                    help='link to extract code. Will be https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p6/javadocs/Intersection.html by default')
+args = parser.parse_args()
+
 
 # Function to create javadocs from list
 def create_javadocs(list, tab):
@@ -17,7 +27,7 @@ def squish(array):
     array = "".join(array)
     array = array.replace("\xa0", " ")
     array = array.replace("\n", "")
-
+    array = array.replace("\r","")
     return array
 
 # Function to parse BS Array to list
@@ -86,10 +96,20 @@ def delete_override(list):
     return False
 
 # Set up beautifulsoup4
-page = requests.get("https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/Object.html")
+page = requests.get(args.link)
 # soup = BeautifulSoup(open("./Intersection.html"), "html.parser")
 soup = BeautifulSoup(page.text, "html.parser")
-className = soup.title.string.lower()
+
+className = soup.title.string
+
+if args.output:
+    import sys
+    import os
+    out_path=os.path.join(os.getcwd(),className)+'.java'
+    print(f"print code extracted from {args.link} to {out_path}")
+    sys.stdout=open(out_path,'w')
+
+className=className.lower()
 
 # Main part of document:
 main = soup.main
