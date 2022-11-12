@@ -125,7 +125,14 @@ classHeader = "".join(classHeader)
 classHeader = classHeader.replace("\n", " ")
 
 # Get the class-description
-classDescription = class_java.find("div", {"class": className}).string
+classDescription = class_java.find("div", {"class": className})
+
+# Alternative place of class-description
+if classDescription is None:
+    classDescription = class_java.find("div", {"class": "block"})
+
+classDescription = classDescription.string
+
 classDescription = parse(classDescription)
 
 # Make the javadocs for class
@@ -135,34 +142,67 @@ print(create_javadocs(classDescription, 0))
 print(classHeader + " {\n") 
 
 #
+# Get the instance fields
+#
+instanceFields = main.find("section", {"class": "details"}).find("section", {"id": "field-detail"})
+      
+if instanceFields is not None:
+    instanceFields = instanceFields.find("ul", {"class": "member-list"})
+
+    # Loop through instance fields
+    for instanceField in instanceFields.contents:
+        # Skip empty lines
+        if instanceField == "\n":
+            continue
+
+        # Get the field code
+        fieldName = instanceField.find("div", {"class": "member-signature"})
+        fieldName = squish(fieldName.find_all(text=True))
+
+        # Get the field description
+        fieldDescription = squish(instanceField.find("div", {"class": "block"}).find_all(text=True))
+
+        # Make the field
+        print("\t" + fieldName + ";" + "\t// " +fieldDescription)
+
+print()
+
+#
 # Constructor
 #
 
 # Get the constructor
 constructor = main.find("section", {"id": "constructor-detail"})
 
-# Get the constructor-header
-constructorHeader = constructor.find("div", {"class": "member-signature"}).find_all(text=True)
-constructorHeader = squish(constructorHeader)
+# In case there is no constructor
+if constructor is not None:
 
-# Get the constructor-description
-constructorDescription = constructor.find("div", {"class": className})
-constructorDescription = parse(constructorDescription)
+    # Get the constructor-header
+    constructorHeader = constructor.find("div", {"class": "member-signature"}).find_all(text=True)
+    constructorHeader = squish(constructorHeader)
 
-# Get the constructor parameters
-constructorParameters = constructor.find("dl").find_all(text=True)
-constructorParameters = parse(constructorParameters)
+    # Get the constructor-description
+    constructorDescription = constructor.find("div", {"class": className})
+    
+    # Alternative case for constructor-description
+    if constructorDescription is None:
+        constructorDescription = constructor.find("div", {"class": "block"})
+    constructorDescription = parse(constructorDescription)
 
-# Add @param to parameters
-for i in range(len(constructorParameters)):
-      if constructorParameters[i] != "" and constructorParameters[i] != "Parameters:":
-        constructorParameters[i] = "@param " + constructorParameters[i]
+    # Get the constructor parameters
+    constructorParameters = constructor.find("dl").find_all(text=True)
+    constructorParameters = parse(constructorParameters)
 
-# Print javadocs for constructor
-print(create_javadocs(constructorDescription + constructorParameters, 1))
+    # Add @param to parameters
+    for i in range(len(constructorParameters)):
+          if constructorParameters[i] != "" and constructorParameters[i] != "Parameters:":
+            constructorParameters[i] = "@param " + constructorParameters[i]
 
-# Print Constructor
-print("\t" + constructorHeader + " {\n" + "\t\t// TODO: Implement\n\t}" + "\n")
+    # Print javadocs for constructor
+    print(create_javadocs(constructorDescription + constructorParameters, 1))
+
+    # Print Constructor
+    print("\t" + constructorHeader + " {\n" + "\t\t// TODO: Implement\n\t}" + "\n")
 
 # 
 # Get functions
@@ -181,7 +221,14 @@ for loopFunction in functions.contents:
     loopFunctionHeader = squish(loopFunctionHeader)
 
     # Get the loopFunction-description
-    loopFunctionDescription = loopFunction.find("div", {"class": className}).find_all(text=True)
+    loopFunctionDescription = loopFunction.find("div", {"class": className})
+    
+    # Alternate place of loopFunction-description
+    if loopFunctionDescription is None:
+        loopFunctionDescription = loopFunction.find("div", {"class": "block"})
+
+    loopFunctionDescription = loopFunctionDescription.find_all(text=True)
+
     loopFunctionDescription = parse(loopFunctionDescription)
 
     # Get the loopFunction parameters

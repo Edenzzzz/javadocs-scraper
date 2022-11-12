@@ -3,6 +3,5 @@
 A python program that converts a javadocs class page into a java template.
 
 ## TODO
-- Add command line arguments
-- Redirect stdout to file
 - Add compatibility with other javadocs formats
+- Fix parameters javadocs
