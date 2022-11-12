@@ -190,8 +190,13 @@ if constructor is not None:
     constructorDescription = parse(constructorDescription)
 
     # Get the constructor parameters
-    constructorParameters = constructor.find("dl").find_all(text=True)
-    constructorParameters = parse(constructorParameters)
+    constructorParameters = constructor.find("dl")
+
+    # In case there is no parameters
+    if constructorParameters is not None:
+        constructorParameters = parse(constructorParameters.find_all(text=True))
+    else:
+        constructorParameters = []
 
     # Add @param to parameters
     for i in range(len(constructorParameters)):
@@ -232,14 +237,19 @@ for loopFunction in functions.contents:
     loopFunctionDescription = parse(loopFunctionDescription)
 
     # Get the loopFunction parameters
-    loopFunctionParameters = loopFunction.find("dl").find_all(text=True)
-    loopFunctionParameters = parse(loopFunctionParameters)
+    loopFunctionParameters = loopFunction.find("dl")
 
-    # Add @tags to parameters
-    loopFunctionParameters = add_tags(loopFunctionParameters)
-    
-    # Check if there is override
-    override = delete_override(loopFunctionParameters)
+    # In case function has no parameters
+    if loopFunctionParameters is not None:
+        loopFunctionParameters = parse(loopFunctionParameters.find_all(text=True))
+
+        # Add @tags to parameters
+        loopFunctionParameters = add_tags(loopFunctionParameters)
+
+        # Check if there is override
+        override = delete_override(loopFunctionParameters)
+    else: 
+        loopFunctionParameters = []
 
     # Print javadocs for loopFunction
     print(create_javadocs(loopFunctionDescription + loopFunctionParameters, 1))
