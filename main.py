@@ -218,8 +218,11 @@ if constructor is not None:
 # 
 # Get functions
 # 
-functions = main.find("section", {"id": "method-detail"}).find("ul", {"class": "member-list"})
-
+#add try catch for enum class (https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p7/javadocs/ListingMode.html) compatibility
+try:
+    functions = main.find("section", {"id": "method-detail"}).find("ul", {"class": "member-list"})
+except:
+    pass#TODO implement for enum class
 # Loop through functions
 for loopFunction in functions.contents:
 
