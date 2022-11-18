@@ -7,10 +7,11 @@ from bs4 import BeautifulSoup
 import requests
 import argparse
 parser=argparse.ArgumentParser()
+default_link='https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p7/javadocs/ListingMode.html'
 parser.add_argument('--output', type=bool,default=True, help="Redirect stdout to java file with class name.")
 parser.add_argument('--link', type=str, required=False,
-                    default='https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p6/javadocs/Intersection.html',
-                    help='link to extract code. Will be https://cs300-www.cs.wisc.edu/wp/wp-content/uploads/2020/12/fall2022/p6/javadocs/Intersection.html by default')
+                    default=default_link,
+                    help=f'link to extract code. Will be {default_link} by default')
 args = parser.parse_args()
 
 
@@ -129,10 +130,15 @@ classDescription = class_java.find("div", {"class": className})
 
 # Alternative place of class-description
 if classDescription is None:
+    #ignore line break token <br>
+    for linebreak in class_java.find_all('br'):
+        linebreak.extract()
     classDescription = class_java.find("div", {"class": "block"})
-
-classDescription = classDescription.string
-
+    
+if classDescription.string!=None:
+    classDescription = classDescription.string#why is this NoneType while classDescription is the correct string?
+else:
+    pass
 classDescription = parse(classDescription)
 
 # Make the javadocs for class
